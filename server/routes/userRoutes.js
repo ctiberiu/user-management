@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createUser, getUsers, getUserById, updateUser, deleteUser } = require('../controllers/userController');
+const { verifyToken } = require('../middleware/authMiddleware');
 
 // Create a new user
 router.post('/', createUser);
@@ -12,7 +13,7 @@ router.get('/', getUsers);
 router.get('/:id', getUserById);
 
 // Update a user by ID
-router.put('/:id', updateUser);
+router.put('/:id', verifyToken, updateUser);
 
 // Delete a user by ID
 router.delete('/:id', deleteUser);

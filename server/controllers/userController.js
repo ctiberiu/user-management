@@ -1,13 +1,26 @@
 const pool = require('../db');
+const bcrypt = require('bcrypt');
+
 
 const createUser = async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
 
   try {
 
+    if(!first_name || !last_name || !email || !password) {
+      return res.status(400).json({ error: 'Please provide all required fields' });
+    }
+
+    const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: 'User with this email already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const query = {
       text: 'INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4)',
-      values: [first_name, last_name, email, password],
+      values: [first_name, last_name, email, hashedPassword],
     };
 
     await pool.query(query);
