@@ -64,10 +64,12 @@ const updateUser = async (req, res) => {const { id } = req.params;
   const { first_name, last_name, email, password } = req.body; // Extract editable fields only
 
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Construct the SQL query dynamically based on the editable fields
     const query = {
       text: `UPDATE users SET first_name = $1, last_name = $2, email = $3, password = $4 WHERE id = $5`,
-      values: [first_name, last_name, email, password, id],
+      values: [first_name, last_name, email, hashedPassword, id],
     };
 
     // Execute the SQL query to update the user record
